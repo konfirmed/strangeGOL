@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strange Game of Life Simulation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="container">
+        <div id="gameCanvas"></div>
+        <div id="legend">
+            <div class="legend-item"><div class="color-box under-5"></div>Children (0-4): <span id="under5Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-5-9"></div>Children (5-9): <span id="age5to9Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-10-14"></div>Children (10-14): <span id="age10to14Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-15-19"></div>Teenagers (15-19): <span id="age15to19Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-20-24"></div>Young Adults (20-24): <span id="age20to24Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-25-29"></div>Adults (25-29): <span id="age25to29Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-30-34"></div>Adults (30-34): <span id="age30to34Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-35-39"></div>Adults (35-39): <span id="age35to39Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-40-44"></div>Adults (40-44): <span id="age40to44Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-45-49"></div>Adults (45-49): <span id="age45to49Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-50-54"></div>Middle-aged (50-54): <span id="age50to54Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-55-59"></div>Middle-aged (55-59): <span id="age55to59Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-60-64"></div>Seniors (60-64): <span id="age60to64Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-65-69"></div>Seniors (65-69): <span id="age65to69Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-70-74"></div>Seniors (70-74): <span id="age70to74Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-75-79"></div>Elderly (75-79): <span id="age75to79Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-80-84"></div>Elderly (80-84): <span id="age80to84Count">0</span></div>
+            <div class="legend-item"><div class="color-box age-85-plus"></div>Elderly (85+): <span id="age85plusCount">0</span></div>
+            <div class="legend-item">Total Alive: <span id="totalCount">0</span></div>
+            <div class="legend-item">XX Count: <span id="XXCount">0</span></div>
+            <div class="legend-item">XY Count: <span id="XYCount">0</span></div>
+            <div class="legend-item">Birth Rate: <span id="birthRate">0</span></div>
+            <div class="legend-item">Death Rate: <span id="deathRate">0</span></div>
+            <div class="legend-item">Single People: <span id="singleCount">0</span></div>
+            <div class="legend-item">Married People: <span id="marriedCount">0</span></div>
+            <div class="legend-item">Divorced: <span id="divorcedCount">0</span></div>
+            <div class="legend-item">Remarried: <span id="remarriedCount">0</span></div>
+            <div class="legend-item">Widow: <span id="widowCount">0</span></div>
+            <div class="legend-item">Widower: <span id="widowerCount">0</span></div>
+            <div class="legend-item">In Primary Education: <span id="primaryEducationCount">0</span></div>
+            <div class="legend-item">In Secondary Education: <span id="secondaryEducationCount">0</span></div>
+            <div class="legend-item">In Tertiary Education: <span id="tertiaryEducationCount">0</span></div>
+            <div class="legend-item">Employed: <span id="employedCount">0</span></div>
+            <div class="legend-item">Unemployed: <span id="unemployedCount">0</span></div>
+            <div class="legend-item">Farmer: <span id="farmerCount">0</span></div>
+            <div class="legend-item">Teacher: <span id="teacherCount">0</span></div>
+            <div class="legend-item">Engineer: <span id="engineerCount">0</span></div>
+            <div class="legend-item">Doctor: <span id="doctorCount">0</span></div>
+            <div class="legend-item">Trader: <span id="traderCount">0</span></div>
+            <div class="legend-item">Artisan: <span id="artisanCount">0</span></div>
+            <div class="legend-item">Lawyer: <span id="lawyerCount">0</span></div>
+            <div class="legend-item">Christianity: <span id="christianityCount">0</span></div>
+            <div class="legend-item">Islam: <span id="islamCount">0</span></div>
+            <div class="legend-item">Traditional: <span id="traditionalCount">0</span></div>
+            <div class="legend-item">None: <span id="noneCount">0</span></div>
+            <div class="legend-item">Year: <span id="currentYear">2023</span></div>
+        </div>
+        <div id="controls">
+            <button id="pauseButton">Pause</button>
+            <button id="resumeButton">Resume</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
