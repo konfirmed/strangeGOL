@@ -8,33 +8,33 @@ let targetPopulation2050 = 377_000_000; // Target population for 2050
 let currentYear = initialYear;
 
 const ageGroups = [
-    { ageRange: '0-4', percentage: 10.13, birthRate: 0.03, deathRate: 0.01 },
-    { ageRange: '5-9', percentage: 8.97, birthRate: 0.0, deathRate: 0.005 },
-    { ageRange: '10-14', percentage: 7.23, birthRate: 0.0, deathRate: 0.005 },
-    { ageRange: '15-19', percentage: 6.68, birthRate: 0.0, deathRate: 0.01 },
-    { ageRange: '20-24', percentage: 6.02, birthRate: 0.04, deathRate: 0.01 },
-    { ageRange: '25-29', percentage: 5.48, birthRate: 0.05, deathRate: 0.01 },
-    { ageRange: '30-34', percentage: 4.25, birthRate: 0.04, deathRate: 0.01 },
-    { ageRange: '35-39', percentage: 3.29, birthRate: 0.03, deathRate: 0.015 },
-    { ageRange: '40-44', percentage: 2.90, birthRate: 0.02, deathRate: 0.02 },
-    { ageRange: '45-49', percentage: 2.06, birthRate: 0.01, deathRate: 0.025 },
-    { ageRange: '50-54', percentage: 1.90, birthRate: 0.0, deathRate: 0.03 },
-    { ageRange: '55-59', percentage: 0.93, birthRate: 0.0, deathRate: 0.035 },
-    { ageRange: '60-64', percentage: 1.10, birthRate: 0.0, deathRate: 0.04 },
-    { ageRange: '65-69', percentage: 0.53, birthRate: 0.0, deathRate: 0.05 },
-    { ageRange: '70-74', percentage: 0.60, birthRate: 0.0, deathRate: 0.06 },
-    { ageRange: '75-79', percentage: 0.26, birthRate: 0.0, deathRate: 0.07 },
-    { ageRange: '80-84', percentage: 0.34, birthRate: 0.0, deathRate: 0.08 },
-    { ageRange: '85+', percentage: 0.32, birthRate: 0.0, deathRate: 0.09 }
+    { ageRange: '0-4', percentage: 10.13, birthRate: 0.01, deathRate: 0.005 },
+    { ageRange: '5-9', percentage: 8.97, birthRate: 0.0, deathRate: 0.004 },
+    { ageRange: '10-14', percentage: 7.23, birthRate: 0.0, deathRate: 0.003 },
+    { ageRange: '15-19', percentage: 6.68, birthRate: 0.0, deathRate: 0.002 },
+    { ageRange: '20-24', percentage: 6.02, birthRate: 0.01, deathRate: 0.002 },
+    { ageRange: '25-29', percentage: 5.48, birthRate: 0.01, deathRate: 0.002 },
+    { ageRange: '30-34', percentage: 4.25, birthRate: 0.01, deathRate: 0.002 },
+    { ageRange: '35-39', percentage: 3.29, birthRate: 0.01, deathRate: 0.003 },
+    { ageRange: '40-44', percentage: 2.90, birthRate: 0.01, deathRate: 0.003 },
+    { ageRange: '45-49', percentage: 2.06, birthRate: 0.0, deathRate: 0.004 },
+    { ageRange: '50-54', percentage: 1.90, birthRate: 0.0, deathRate: 0.005 },
+    { ageRange: '55-59', percentage: 0.93, birthRate: 0.0, deathRate: 0.006 },
+    { ageRange: '60-64', percentage: 1.10, birthRate: 0.0, deathRate: 0.007 },
+    { ageRange: '65-69', percentage: 0.53, birthRate: 0.0, deathRate: 0.008 },
+    { ageRange: '70-74', percentage: 0.60, birthRate: 0.0, deathRate: 0.009 },
+    { ageRange: '75-79', percentage: 0.26, birthRate: 0.0, deathRate: 0.01 },
+    { ageRange: '80-84', percentage: 0.34, birthRate: 0.0, deathRate: 0.012 },
+    { ageRange: '85+', percentage: 0.32, birthRate: 0.0, deathRate: 0.015 }
 ];
 
-const maritalStatusDistribution = [0.45, 0.35, 0.05, 0.05, 0.05, 0.05]; // Single, Married, Divorced, Remarried, Widow, Widower
-const occupationDistribution = ["farmer", "teacher", "engineer", "doctor", "trader", "artisan", "lawyer"];
-const religionDistribution = ["christianity", "islam", "traditional", "none"];
+const maritalStatusDistribution = [0.42, 0.38, 0.10, 0.05, 0.035, 0.015]; // Single, Married, Divorced, Remarried, Widow, Widower
+const occupationDistribution = ["farmer", "teacher", "engineer", "doctor", "trader", "artisan", "lawyer", "student", "N/A"];
+const religionDistribution = ["christianity", "islam", "traditional", "atheist"];
 
 const totalCells = rows * cols;
 let grid = Array.from({ length: rows }, () => Array.from({ length: cols }, () => ({
-    alive: false, age: 0, sex: null, education: null, employment: null, maritalStatus: null, occupation: null, religion: null
+    alive: false, age: 0, realAge: 0, sex: null, education: null, employment: null, maritalStatus: null, occupation: null, religion: null
 })));
 let birthRate = 0;
 let deathRate = 0;
@@ -93,10 +93,7 @@ function createBoard() {
             const cell = document.createElement('div');
             cell.classList.add('cell');
             cell.id = `${i}-${j}`;
-            cell.addEventListener('click', () => {
-                grid[i][j].employment = grid[i][j].employment === 'employed' ? 'unemployed' : 'employed';
-                updateBoard();
-            });
+            cell.addEventListener('click', () => showCellDetails(i, j));
             canvas.appendChild(cell);
         }
     }
@@ -104,22 +101,28 @@ function createBoard() {
 
 function initializeGrid() {
     let totalCellsAssigned = 0;
+    let cellsToAssign = totalCells;
     ageGroups.forEach((group, index) => {
-        const ageGroupCount = Math.floor((group.percentage / 100) * totalCells);
+        let ageGroupCount = Math.floor((group.percentage / 100) * totalCells);
+        if (totalCellsAssigned + ageGroupCount > totalCells) {
+            ageGroupCount = totalCells - totalCellsAssigned;
+        }
         for (let i = 0; i < ageGroupCount && totalCellsAssigned < totalCells; i++) {
             const x = Math.floor(Math.random() * rows);
             const y = Math.floor(Math.random() * cols);
             if (!grid[x][y].alive) {
                 const sex = Math.random() < 0.5 ? 'XX' : 'XY';
-                const education = Math.random() < 0.3 ? 'primary' : Math.random() < 0.5 ? 'secondary' : 'tertiary';
-                const employment = Math.random() < 0.7 ? 'employed' : 'unemployed';
-                const maritalStatus = assignMaritalStatus();
-                const occupation = occupationDistribution[Math.floor(Math.random() * occupationDistribution.length)];
+                const realAge = Math.floor(Math.random() * 5) + (index * 5); // Real age within the age range
+                let education = getEducation(realAge);
+                let employment = getEmployment(realAge);
+                let maritalStatus = getMaritalStatus(realAge);
+                let occupation = getOccupation(realAge);
                 const religion = religionDistribution[Math.floor(Math.random() * religionDistribution.length)];
 
                 grid[x][y] = {
                     alive: true,
                     age: index,
+                    realAge: realAge,
                     sex: sex,
                     education: education,
                     employment: employment,
@@ -130,27 +133,89 @@ function initializeGrid() {
 
                 counts.totalCount++;
                 counts[`age${index}Count`]++;
-                counts[`${education}EducationCount`]++;
-                counts[`${employment}Count`]++;
-                counts[`${maritalStatus}Count`]++;
-                counts[`${occupation}Count`]++;
+                if (education) counts[`${education}EducationCount`]++;
+                if (employment) counts[`${employment}Count`]++;
+                if (maritalStatus) counts[`${maritalStatus}Count`]++;
+                if (occupation) counts[`${occupation}Count`]++;
                 counts[`${religion}Count`]++;
                 sex === 'XX' ? counts.XXCount++ : counts.XYCount++;
                 totalCellsAssigned++;
+                cellsToAssign--;
             }
         }
     });
+
+    // If there are any unassigned cells, randomly assign them to age groups to balance the grid
+    while (cellsToAssign > 0) {
+        const x = Math.floor(Math.random() * rows);
+        const y = Math.floor(Math.random() * cols);
+        if (!grid[x][y].alive) {
+            const sex = Math.random() < 0.5 ? 'XX' : 'XY';
+            const index = Math.floor(Math.random() * ageGroups.length);
+            const realAge = Math.floor(Math.random() * 5) + (index * 5);
+            let education = getEducation(realAge);
+            let employment = getEmployment(realAge);
+            let maritalStatus = getMaritalStatus(realAge);
+            let occupation = getOccupation(realAge);
+            const religion = religionDistribution[Math.floor(Math.random() * religionDistribution.length)];
+
+            grid[x][y] = {
+                alive: true,
+                age: index,
+                realAge: realAge,
+                sex: sex,
+                education: education,
+                employment: employment,
+                maritalStatus: maritalStatus,
+                occupation: occupation,
+                religion: religion
+            };
+
+            counts.totalCount++;
+            counts[`age${index}Count`]++;
+            if (education) counts[`${education}EducationCount`]++;
+            if (employment) counts[`${employment}Count`]++;
+            if (maritalStatus) counts[`${maritalStatus}Count`]++;
+            if (occupation) counts[`${occupation}Count`]++;
+            counts[`${religion}Count`]++;
+            sex === 'XX' ? counts.XXCount++ : counts.XYCount++;
+            cellsToAssign--;
+        }
+    }
+
     updateBoard();
 }
 
-function assignMaritalStatus() {
+function getEducation(realAge) {
+    if (realAge < 5) return 'N/A';
+    if (realAge >= 5 && realAge < 9) return Math.random() < 0.5 ? 'N/A' : 'primary';
+    if (realAge >= 9 && realAge < 16) return Math.random() < 0.5 ? 'primary' : 'secondary';
+    if (realAge >= 16 && realAge < 18) return Math.random() < 0.33 ? 'primary' : Math.random() < 0.5 ? 'secondary' : 'tertiary';
+    if (realAge >= 18) return 'tertiary';
+    return 'N/A';
+}
+
+function getEmployment(realAge) {
+    if (realAge < 5) return 'N/A';
+    if (realAge >= 5 && realAge < 18) return 'student';
+    if (realAge >= 18) return Math.random() < 0.7 ? 'employed' : 'unemployed';
+    return 'N/A';
+}
+
+function getMaritalStatus(realAge) {
+    if (realAge < 18) return 'N/A';
     const rand = Math.random();
     if (rand < maritalStatusDistribution[0]) return 'single';
-    else if (rand < maritalStatusDistribution[0] + maritalStatusDistribution[1]) return 'married';
-    else if (rand < maritalStatusDistribution[0] + maritalStatusDistribution[1] + maritalStatusDistribution[2]) return 'divorced';
-    else if (rand < maritalStatusDistribution[0] + maritalStatusDistribution[1] + maritalStatusDistribution[2] + maritalStatusDistribution[3]) return 'remarried';
-    else if (rand < maritalStatusDistribution[0] + maritalStatusDistribution[1] + maritalStatusDistribution[2] + maritalStatusDistribution[3] + maritalStatusDistribution[4]) return 'widow';
-    else return 'widower';
+    if (rand < maritalStatusDistribution[0] + maritalStatusDistribution[1]) return 'married';
+    if (rand < maritalStatusDistribution[0] + maritalStatusDistribution[1] + maritalStatusDistribution[2]) return 'divorced';
+    if (rand < maritalStatusDistribution[0] + maritalStatusDistribution[1] + maritalStatusDistribution[2] + maritalStatusDistribution[3]) return 'remarried';
+    if (rand < maritalStatusDistribution[0] + maritalStatusDistribution[1] + maritalStatusDistribution[2] + maritalStatusDistribution[3] + maritalStatusDistribution[4]) return 'widow';
+    return 'widower';
+}
+
+function getOccupation(realAge) {
+    if (realAge < 18) return 'N/A';
+    return occupationDistribution[Math.floor(Math.random() * occupationDistribution.length)];
 }
 
 function updateBoard() {
@@ -316,7 +381,7 @@ function updateBoard() {
                     case 'traditional':
                         counts.traditionalCount++;
                         break;
-                    case 'none':
+                    case 'atheist':
                         counts.noneCount++;
                         break;
                 }
@@ -384,11 +449,17 @@ function getNextState(grid) {
             const state = grid[i][j];
             
             if (state.alive) {
-                if (Math.random() < 0.05) { // Random aging factor
-                    nextGrid[i][j].age = state.age + 1; // Age the cell
-                    if (Math.random() < 0.02 * state.age) { // Random death probability increases with age
+                state.realAge++; // Increment the real age
+                if (Math.random() < 0.1) { // Random aging factor
+                    state.age = Math.floor(state.realAge / 5); // Update age group based on real age
+                    if (state.age < ageGroups.length && Math.random() < ageGroups[state.age].deathRate) { // Death probability based on age group
                         nextGrid[i][j].alive = false; // Cell dies
                         deathRate++;
+                    } else {
+                        nextGrid[i][j].education = getEducation(state.realAge);
+                        nextGrid[i][j].employment = getEmployment(state.realAge);
+                        nextGrid[i][j].maritalStatus = getMaritalStatus(state.realAge);
+                        nextGrid[i][j].occupation = getOccupation(state.realAge);
                     }
                 }
             }
@@ -396,11 +467,12 @@ function getNextState(grid) {
             if (!nextGrid[i][j].alive) {
                 nextGrid[i][j].alive = true; // Respawn a new cell
                 nextGrid[i][j].age = 0; // New cell starts as an infant
+                nextGrid[i][j].realAge = 0; // Reset real age
                 nextGrid[i][j].sex = Math.random() < 0.5 ? 'XX' : 'XY';
-                nextGrid[i][j].education = Math.random() < 0.3 ? 'primary' : Math.random() < 0.5 ? 'secondary' : 'tertiary';
-                nextGrid[i][j].employment = Math.random() < 0.7 ? 'employed' : 'unemployed';
-                nextGrid[i][j].maritalStatus = assignMaritalStatus();
-                nextGrid[i][j].occupation = occupationDistribution[Math.floor(Math.random() * occupationDistribution.length)];
+                nextGrid[i][j].education = getEducation(nextGrid[i][j].realAge);
+                nextGrid[i][j].employment = getEmployment(nextGrid[i][j].realAge);
+                nextGrid[i][j].maritalStatus = getMaritalStatus(nextGrid[i][j].realAge);
+                nextGrid[i][j].occupation = getOccupation(nextGrid[i][j].realAge);
                 nextGrid[i][j].religion = religionDistribution[Math.floor(Math.random() * religionDistribution.length)];
                 birthRate++;
             }
@@ -441,3 +513,25 @@ function startSimulation() {
 }
 
 startSimulation();
+
+function getAgeRange(index) {
+    const ageRanges = [
+        '0-4', '5-9', '10-14', '15-19', '20-24', '25-29', '30-34', '35-39',
+        '40-44', '45-49', '50-54', '55-59', '60-64', '65-69', '70-74', '75-79',
+        '80-84', '85+'
+    ];
+    return ageRanges[index] || 'Unknown';
+}
+
+function showCellDetails(x, y) {
+    const cell = grid[x][y];
+    const ageRange = getAgeRange(cell.age);
+    alert(`Cell Details:
+    Age: ${cell.realAge} (Age Group: ${ageRange})
+    Sex: ${cell.sex}
+    Education: ${cell.education ? cell.education : 'N/A'}
+    Employment: ${cell.employment ? cell.employment : 'N/A'}
+    Marital Status: ${cell.maritalStatus ? cell.maritalStatus : 'N/A'}
+    Occupation: ${cell.occupation ? cell.occupation : 'N/A'}
+    Religion: ${cell.religion}`);
+}

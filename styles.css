@@ -5,18 +5,17 @@ body {
     background-color: #f0f0f0;
     margin: 0;
     font-family: Arial, sans-serif;
-    height: 100vh; /* Full viewport height */
-    width: 100vw; /* Full viewport width */
+    width: 100vw;
     justify-content: center;
 }
 
 #container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    justify-content: center;
+    flex-direction: row;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1200px;
+    justify-content: space-around;
 }
 
 #gameCanvas {
@@ -31,7 +30,7 @@ body {
     width: 8px;
     height: 8px;
     background-color: white;
-    border: 1px solid #333; /* Darker border for better visibility */
+    border: 1px solid #333;
     position: relative;
 }
 
@@ -61,25 +60,30 @@ body {
 .employed { box-shadow: 0 0 5px green; }
 .unemployed { box-shadow: 0 0 5px gray; }
 
+#sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+}
+
 #legend {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    background-color: #fff; /* Background for better readability */
-    padding: 10px;
-    border: 1px solid #ccc; /* Border to distinguish the legend */
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for better visibility */
-    width: 100%; /* Adjust width as needed */
-    max-width: 800px; /* Set a max width to match game canvas */
-    margin-top: 10px;
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
 
 .legend-item {
     display: flex;
     align-items: center;
-    margin: 5px 10px;
-    width: calc(33.333% - 20px); /* Three items per row */
+    margin: 5px 0;
+    width: calc(50% - 10px);
 }
 
 .color-box {
@@ -89,10 +93,27 @@ body {
     margin-right: 10px;
 }
 
-#XXCount, #XYCount, #farmerCount, #teacherCount, #engineerCount, #doctorCount, #traderCount, #artisanCount, #lawyerCount, #christianityCount, #islamCount, #traditionalCount, #noneCount {
-    font-weight: bold;
-}
-
 #controls {
     margin-top: 20px;
+}
+
+#cellDetails {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    text-align: left;
+}
+
+@media (max-width: 768px) {
+    #container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .legend-item {
+        width: 100%;
+    }
 }
